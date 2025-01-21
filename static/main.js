@@ -30,6 +30,7 @@ var getUserMedia =
 
 sendmessage = (text) => {
     if (event.key === "Enter" && text.value != "") {
+        console.log("Sending message:", text.value);
         socket.emit("messagesend", myname + ' : ' + text.value);
         text.value = "";
         main__chat_window.scrollTop = main__chat_window.scrollHeight;
@@ -85,6 +86,7 @@ peer.on("error", (err) => {
 });
 
 socket.on("createMessage", (message) => {
+    console.log("New message received:", message);
     var ul = document.getElementById("messageadd");
     var li = document.createElement("li");
     li.className = "message";
@@ -166,9 +168,11 @@ const showchat = () => {
 };
 
 const addVideoStream = (videoEl, stream, name) => {
+        console.log("Adding video stream for user:", name);
     videoEl.srcObject = stream;
     videoEl.addEventListener("loadedmetadata", () => {
         videoEl.play();
+        console.log(`Video stream for ${name} is now playing.`);
     });
     const h1 = document.createElement("h1");
     const h1name = document.createTextNode(name);
@@ -177,6 +181,7 @@ const addVideoStream = (videoEl, stream, name) => {
     videoGrid.classList.add("video-grid");
     videoGrid.appendChild(h1);
     videoGrids.appendChild(videoGrid);
+    console.log("Video added to grid for:", name);
     videoGrid.append(videoEl);
     RemoveUnusedDivs();
     let totalUsers = document.getElementsByTagName("video").length;
