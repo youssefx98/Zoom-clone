@@ -41,24 +41,34 @@ app.get("/join/:rooms", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  socket.on("join-room", (roomId, id, myname) => {
-    socket.join(roomId);
-    socket.to(roomId).broadcast.emit("user-connected", id, myname);
+    console.log("New user connected with socket ID:", socket.id);
 
-    socket.on("messagesend", (message) => {
-      console.log(message);
-      io.to(roomId).emit("createMessage", message);
-    });
+    socket.on("join-room", (roomId, id, myname) => {
+        console.log(`User "${myname}" with Peer ID "${id}" joined room: "${roomId}"`);
+        socket.join(roomId);
 
-    socket.on("tellName", (myname) => {
-      console.log(myname);
-      socket.to(roomId).broadcast.emit("AddName", myname);
-    });
+        // Notify other users in the room
+        socket.to(roomId).broadcast.emit("user-connected", id, myname);
 
-    socket.on("disconnect", () => {
-      socket.to(roomId).broadcast.emit("user-disconnected", id);
+        // Log message sent
+        socket.on("messagesend", (message) => {
+            console.log(`Message in room "${roomId}":`, message);
+            io.to(roomId).emit("createMessage", message);
+        });
+
+        // Log names broadcasted
+        socket.on("tellName", (myname) => {
+            console.log(`Name received in room "${roomId}":`, myname);
+            socket.to(roomId).broadcast.emit("AddName", myname);
+        });
+
+        // Log disconnections
+        socket.on("disconnect", () => {
+            console.log(`User "${myname}" with Peer ID "${id}" disconnected from room: "${roomId}"`);
+            socket.to(roomId).broadcast.emit("user-disconnected", id);
+        });
     });
-  });
 });
+
 
 server.listen(process.env.PORT || 3030);
