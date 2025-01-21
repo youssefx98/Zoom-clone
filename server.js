@@ -1,21 +1,26 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
+const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 const io = require("socket.io")(server);
 const { ExpressPeerServer } = require("peer");
 const url = require("url");
 const peerServer = ExpressPeerServer(server, {
-  debug: true,
+    debug: true,
 });
 const path = require("path");
 
+// Map to store the room each socket belongs to
+const socketRoomMap = new Map();
+
 app.set("view engine", "ejs");
+app.use(cors());
 app.use("/public", express.static(path.join(__dirname, "static")));
 app.use("/peerjs", peerServer);
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "index.html"));
+    res.sendFile(path.join(__dirname, "static", "index.html"));
 });
 
 app.get("/join", (req, res) => {
@@ -44,41 +49,41 @@ app.get("/join/:rooms", (req, res) => {
     res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
 });
 
-
 io.on("connection", (socket) => {
     console.log("New user connected with socket ID:", socket.id);
 
-socket.on("join-room", (roomId, id, myname) => {
-    console.log(`User "${myname}" with Peer ID "${id}" is joining room: "${roomId}"`);
-    socket.join(roomId);
-    console.log(`Broadcasting "user-connected" for Peer ID "${id}" in room: "${roomId}"`);
-    socket.to(roomId).broadcast.emit("user-connected", id, myname);
-});
+    // When a user joins a room
+    socket.on("join-room", (roomId, id, myname) => {
+        console.log(`User "${myname}" with Peer ID "${id}" is joining room: "${roomId}"`);
+        socket.join(roomId);
 
+        // Store the room ID for this socket
+        socketRoomMap.set(socket.id, roomId);
 
-        // Notify other users in the room
+        console.log(`Broadcasting "user-connected" for Peer ID "${id}" in room: "${roomId}"`);
         socket.to(roomId).broadcast.emit("user-connected", id, myname);
 
-        // Log message sent
+        // Handle messages
         socket.on("messagesend", (message) => {
             console.log(`Message in room "${roomId}":`, message);
             io.to(roomId).emit("createMessage", message);
         });
 
-        // Log names broadcasted
-socket.on("tellName", (myname) => {
-    console.log(`Received "tellName" for user: ${myname}`);
-    socket.to(roomId).broadcast.emit("AddName", myname);
-});
+        // Handle name broadcasting
+        socket.on("tellName", (myname) => {
+            console.log(`Received "tellName" for user: ${myname}`);
+            socket.to(roomId).broadcast.emit("AddName", myname);
+        });
 
-
-        // Log disconnections
+        // Handle disconnection
         socket.on("disconnect", () => {
             console.log(`User "${myname}" with Peer ID "${id}" disconnected from room: "${roomId}"`);
             socket.to(roomId).broadcast.emit("user-disconnected", id);
+
+            // Remove the socket's room mapping
+            socketRoomMap.delete(socket.id);
         });
     });
-
-
+});
 
 server.listen(process.env.PORT || 3030);
