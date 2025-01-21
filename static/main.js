@@ -14,10 +14,12 @@ window.onload = () => {
 };
 
 var peer = new Peer(undefined, {
-  path: "/peerjs",
-  host: "/",
-  port: "3030",
+    path: "/peerjs",
+    host: window.location.hostname,
+    port: window.location.protocol === "https:" ? 443 : 80,
+    secure: window.location.protocol === "https:",
 });
+
 
 let myVideoStream;
 const peers = {};
