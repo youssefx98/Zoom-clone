@@ -100,9 +100,10 @@ socket.on("createMessage", (message) => {
 });
 
 socket.on("AddName", (username) => {
+    console.log("Other user's name received:", username);
     OtherUsername = username;
-    console.log(username);
 });
+
 
 const RemoveUnusedDivs = () => {
     //
