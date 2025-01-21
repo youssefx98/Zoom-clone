@@ -19,26 +19,31 @@ app.get("/", (req, res) => {
 });
 
 app.get("/join", (req, res) => {
-  res.redirect(
-    url.format({
-      pathname: `/join/${uuidv4()}`,
-      query: req.query,
-    })
-  );
+    const roomId = uuidv4();
+    console.log("Redirecting to new room:", roomId);
+    res.redirect(
+        url.format({
+            pathname: `/join/${roomId}`,
+            query: req.query,
+        })
+    );
 });
 
 app.get("/joinold", (req, res) => {
-  res.redirect(
-    url.format({
-      pathname: req.query.meeting_id,
-      query: req.query,
-    })
-  );
+    console.log("Joining existing room:", req.query.meeting_id);
+    res.redirect(
+        url.format({
+            pathname: req.query.meeting_id,
+            query: req.query,
+        })
+    );
 });
 
 app.get("/join/:rooms", (req, res) => {
-  res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
+    console.log(`Rendering room "${req.params.rooms}" for user:`, req.query.name);
+    res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
 });
+
 
 io.on("connection", (socket) => {
     console.log("New user connected with socket ID:", socket.id);
