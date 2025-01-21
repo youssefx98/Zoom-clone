@@ -82,7 +82,7 @@ peer.on("call", (call) => {
 });
 
 peer.on("open", (id) => {
-    console.log("Peer connected with ID:", id);
+    console.log("Peer connection open with ID:", id);
     socket.emit("join-room", roomId, id, myname);
 });
 
