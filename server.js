@@ -66,10 +66,11 @@ socket.on("join-room", (roomId, id, myname) => {
         });
 
         // Log names broadcasted
-        socket.on("tellName", (myname) => {
-            console.log(`Name received in room "${roomId}":`, myname);
-            socket.to(roomId).broadcast.emit("AddName", myname);
-        });
+socket.on("tellName", (myname) => {
+    console.log(`Received "tellName" for user: ${myname}`);
+    socket.to(roomId).broadcast.emit("AddName", myname);
+});
+
 
         // Log disconnections
         socket.on("disconnect", () => {
