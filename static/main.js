@@ -47,11 +47,11 @@ navigator.mediaDevices
         myVideoStream = stream;
         addVideoStream(myVideo, stream, myname);
 
-        socket.on("user-connected", (id, username) => {
-            console.log("userid:" + id);
-            connectToNewUser(id, stream, username);
-            socket.emit("tellName", myname);
-        });
+socket.on("user-connected", (id, username) => {
+    console.log(`Received "user-connected" event: ID = ${id}, Username = ${username}`);
+    connectToNewUser(id, myVideoStream, username);
+});
+
 
 socket.on("user-disconnected", (id) => {
     console.log(`User disconnected: ID = ${id}`);
