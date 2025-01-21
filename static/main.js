@@ -72,7 +72,12 @@ peer.on("call", (call) => {
 });
 
 peer.on("open", (id) => {
+    console.log("Peer connected with ID:", id);
     socket.emit("join-room", roomId, id, myname);
+});
+
+peer.on("error", (err) => {
+    console.error("Peer.js error:", err);
 });
 
 socket.on("createMessage", (message) => {
