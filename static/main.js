@@ -143,10 +143,13 @@ const cancel = () => {
     $("#getCodeModal").modal("hide");
 };
 
-const copy = async() => {
+const copy = async () => {
     const roomid = document.getElementById("roomid").innerText;
-    await navigator.clipboard.writeText("http://localhost:3030/join/" + roomid);
+    const inviteLink = `${window.location.origin}/join/${roomid}`;
+    console.log("Copying invite link:", inviteLink);
+    await navigator.clipboard.writeText(inviteLink);
 };
+
 const invitebox = () => {
     $("#getCodeModal").modal("show");
 };
