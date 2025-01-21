@@ -48,9 +48,13 @@ app.get("/join/:rooms", (req, res) => {
 io.on("connection", (socket) => {
     console.log("New user connected with socket ID:", socket.id);
 
-    socket.on("join-room", (roomId, id, myname) => {
-        console.log(`User "${myname}" with Peer ID "${id}" joined room: "${roomId}"`);
-        socket.join(roomId);
+socket.on("join-room", (roomId, id, myname) => {
+    console.log(`User "${myname}" with Peer ID "${id}" is joining room: "${roomId}"`);
+    socket.join(roomId);
+    console.log(`Broadcasting "user-connected" for Peer ID "${id}" in room: "${roomId}"`);
+    socket.to(roomId).broadcast.emit("user-connected", id, myname);
+});
+
 
         // Notify other users in the room
         socket.to(roomId).broadcast.emit("user-connected", id, myname);
