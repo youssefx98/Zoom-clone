@@ -51,10 +51,14 @@ navigator.mediaDevices
             socket.emit("tellName", myname);
         });
 
-        socket.on("user-disconnected", (id) => {
-            console.log(peers);
-            if (peers[id]) peers[id].close();
-        });
+socket.on("user-disconnected", (id) => {
+    console.log(`User disconnected: ID = ${id}`);
+    if (peers[id]) {
+        peers[id].close();
+        delete peers[id];
+    }
+});
+
     });
 peer.on("call", (call) => {
     getUserMedia({ video: true, audio: true },
