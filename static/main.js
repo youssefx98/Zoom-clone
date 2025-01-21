@@ -63,16 +63,20 @@ socket.on("user-disconnected", (id) => {
 
     });
 peer.on("call", (call) => {
-    getUserMedia({ video: true, audio: true },
-        function(stream) {
-            call.answer(stream); // Answer the call with an A/V stream.
+    console.log(`Incoming call from user ID: ${call.peer}`);
+    getUserMedia(
+        { video: true, audio: true },
+        (stream) => {
+            console.log("Answering call with local stream.");
+            call.answer(stream); // Answer the call with an A/V stream
             const video = document.createElement("video");
-            call.on("stream", function(remoteStream) {
+            call.on("stream", (remoteStream) => {
+                console.log("Adding remote stream.");
                 addVideoStream(video, remoteStream, OtherUsername);
             });
         },
-        function(err) {
-            console.log("Failed to get local stream", err);
+        (err) => {
+            console.error("Failed to get local stream:", err);
         }
     );
 });
