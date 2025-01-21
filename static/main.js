@@ -112,18 +112,27 @@ const RemoveUnusedDivs = () => {
 };
 
 const connectToNewUser = (userId, streams, myname) => {
+    console.log(`Connecting to new user: ID = ${userId}, Name = ${myname}`);
     const call = peer.call(userId, streams);
-    const video = document.createElement("video");
+
     call.on("stream", (userVideoStream) => {
-        //       console.log(userVideoStream);
+        console.log(`Receiving video stream from user: ${myname}`);
+        const video = document.createElement("video");
         addVideoStream(video, userVideoStream, myname);
     });
+
     call.on("close", () => {
-        video.remove();
+        console.log(`Call with user ID = ${userId} closed.`);
         RemoveUnusedDivs();
     });
+
+    call.on("error", (err) => {
+        console.error(`Error in call with user ID = ${userId}:`, err);
+    });
+
     peers[userId] = call;
 };
+
 
 const cancel = () => {
     $("#getCodeModal").modal("hide");
